@@ -45,18 +45,15 @@ export default function PostCard({ post = {} }) {
   const saveTooltipId = `bookmark-save-${post?._id || 'post'}`;
   const unsaveTooltipId = `bookmark-unsave-${post?._id || 'post'}`;
   const storageKey = `claps-${post?._id || post?.slug || 'post'}`;
-  const [claps, setClaps] = useState(() => {
-    try {
-      const savedValue = localStorage.getItem(storageKey);
-      return savedValue ? Number(savedValue) : Number(post?.claps || 0);
-    } catch (error) {
-      return Number(post?.claps || 0);
-    }
-  });
+  const [claps, setClaps] = useState(() => Number(post?.likes ?? 0));
 
   useEffect(() => {
     setIsSaved(Boolean(post?.isSaved));
   }, [post?.isSaved]);
+
+  useEffect(() => {
+    setClaps(Number(post?.likes ?? 0));
+  }, [post?._id, post?.likes]);
 
   const load = async () => {
     try {
@@ -67,16 +64,30 @@ export default function PostCard({ post = {} }) {
     }
   };
 
-  const handleClapClicks = () => {
-    setClaps((currentClaps) => {
-      const nextClaps = currentClaps + 1;
+  const handleClapClicks = async () => {
+    if (!post?._id) return;
+
+    try {
+      const res = await api.post(`/posts/${post._id}/like`, { liked: true });
+      const nextClaps = Number(res.data?.data?.likes ?? post?.likes ?? 0);
+      setClaps(nextClaps);
       try {
         localStorage.setItem(storageKey, String(nextClaps));
       } catch (error) {
         console.error('Could not save clap count:', error);
       }
-      return nextClaps;
-    });
+    } catch (error) {
+      setClaps((currentClaps) => {
+        const nextClaps = currentClaps + 1;
+        try {
+          localStorage.setItem(storageKey, String(nextClaps));
+        } catch (saveError) {
+          console.error('Could not save clap count:', saveError);
+        }
+        return nextClaps;
+      });
+      console.error('Could not sync clap with backend:', error);
+    }
   };
 
   const toggleSavePost = async (postId) => {
@@ -185,7 +196,6 @@ export default function PostCard({ post = {} }) {
           />
         </Link>
       )}
-      <hr></hr>
     </article>
   );
 

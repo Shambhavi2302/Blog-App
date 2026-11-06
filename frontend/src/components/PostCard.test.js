@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PostCard from './PostCard';
 import api from '../services/api';
@@ -45,7 +45,33 @@ describe('PostCard content preview', () => {
     ).toBeInTheDocument();
   });
 
+  it('prefers the real post likes count over stale localStorage values', () => {
+    localStorage.setItem('claps-1', '9');
+
+    render(
+      <MemoryRouter>
+        <PostCard
+          post={{
+            _id: '1',
+            slug: 'benefits-of-eating-fruits',
+            title: 'Benefits of Eating Fruits for Good Health',
+            content: '<p>Fruits are essential.</p>',
+            createdAt: '2026-10-15T00:00:00.000Z',
+            author: { name: 'Aarav Nair' },
+            coverImage: 'https://example.com/test.jpg',
+            isSaved: false,
+            likes: 5,
+          }}
+        />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole('button', { name: /claps/i })).toHaveTextContent('5');
+  });
+
   it('increments and persists the clap count in localStorage without hitting the backend', async () => {
+    api.post.mockResolvedValue({ data: { data: { likes: 1 } } });
+
     const post = {
       _id: '1',
       slug: 'benefits-of-eating-fruits',
@@ -55,6 +81,7 @@ describe('PostCard content preview', () => {
       author: { name: 'Aarav Nair' },
       coverImage: 'https://example.com/test.jpg',
       isSaved: false,
+      likes: 0,
     };
 
     const { rerender } = render(
@@ -67,8 +94,11 @@ describe('PostCard content preview', () => {
     expect(clapButton).toHaveTextContent('0');
 
     fireEvent.click(clapButton);
-    expect(clapButton).toHaveTextContent('1');
-    expect(localStorage.getItem('claps-1')).toBe('1');
+
+    await waitFor(() => {
+      expect(clapButton).toHaveTextContent('1');
+      expect(localStorage.getItem('claps-1')).toBe('1');
+    });
 
     rerender(
       <MemoryRouter>
