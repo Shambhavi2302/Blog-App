@@ -1,4 +1,4 @@
-import ReactQuill, { Quill } from "react-quill";
+import { Quill } from "react-quill";
 
 const Font = Quill.import("formats/font");
 

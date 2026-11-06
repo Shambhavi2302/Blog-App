@@ -46,7 +46,7 @@ export default function CreatePost(){
     };
 
     fetchCategories();
-  }, []);
+  }, [category]);
 
   if (!user || !isAuthor) {
     return <div className="mx-auto max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">You must be logged in as an Author to create posts.</div>;

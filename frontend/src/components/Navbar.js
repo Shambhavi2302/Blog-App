@@ -41,6 +41,11 @@ export default function Navbar({ theme, toggleTheme }) {
       <Link to="/" className="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-slate-300 dark:hover:text-white" onClick={() => setMobileMenuOpen(false)}>
         Home
       </Link>
+      {!user ? (
+        <Link to="/login" className="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-slate-300 dark:hover:text-white" onClick={() => setMobileMenuOpen(false)}>
+          Login
+        </Link>
+      ) : null}
       <button
         type="button"
         onClick={toggleTheme}
@@ -98,39 +103,39 @@ export default function Navbar({ theme, toggleTheme }) {
 
   return (
     <>
-    <header className="relative z-50 border-b border-gray-200 bg-white/90 shadow-sm backdrop-blur transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900/90">
-      <div className="container mx-auto flex max-w-[1400px] items-center justify-between px-3 py-3 sm:px-4">
-        <Link to="/" className="text-2xl font-inter sm:text-2xl" onClick={() => setMobileMenuOpen(false)}>
-          BlogNest
-        </Link>
+      <header className="relative z-50 border-b border-gray-200 bg-white/90 shadow-sm backdrop-blur transition-colors duration-300 dark:border-slate-700 dark:bg-slate-900/90">
+        <div className="container mx-auto flex max-w-[1400px] items-center justify-between px-3 py-3 sm:px-4">
+          <Link to="/" className="text-2xl font-inter sm:text-2xl" onClick={() => setMobileMenuOpen(false)}>
+            BlogNest
+          </Link>
 
-        <div className="hidden items-center gap-3 lg:flex lg:items-center lg:justify-end">
-          {navItems}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          aria-expanded={mobileMenuOpen}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-gray-700 transition-colors hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 lg:hidden"
-        >
-          <span className="flex flex-col items-center gap-1.5">
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition-opacity ${mobileMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
-          </span>
-        </button>
-      </div>
-      {mobileMenuOpen ? (
-        <div className="border-t border-gray-200 bg-white/95 dark:border-slate-700 dark:bg-slate-900/95 lg:hidden">
-          <nav className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-3 py-3 sm:px-4">
+          <div className="hidden items-center gap-3 lg:flex lg:items-center lg:justify-end">
             {navItems}
-          </nav>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={mobileMenuOpen}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-gray-700 transition-colors hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 lg:hidden"
+          >
+            <span className="flex flex-col items-center gap-1.5">
+              <span className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`} />
+              <span className={`block h-0.5 w-5 rounded-full bg-current transition-opacity ${mobileMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
+              <span className={`block h-0.5 w-5 rounded-full bg-current transition-transform ${mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`} />
+            </span>
+          </button>
         </div>
-      ) : null}
-    </header>
-    <div className='text-center bg-yellow-500 text-black px-3 py-3'>Access to everything. Now 30% off. <span className='font-bold'>Upgrade now</span></div>
+        {mobileMenuOpen ? (
+          <div className="border-t border-gray-200 bg-white/95 dark:border-slate-700 dark:bg-slate-900/95 lg:hidden">
+            <nav className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-3 py-3 sm:px-4">
+              {navItems}
+            </nav>
+          </div>
+        ) : null}
+      </header>
+      <div className='text-center bg-yellow-500 text-black px-3 py-3'>Access to everything. Now 30% off. <span className='font-bold'>Upgrade now</span></div>
     </>
   );
 }

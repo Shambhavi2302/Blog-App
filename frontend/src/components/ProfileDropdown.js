@@ -2,7 +2,6 @@ import {
   User,
   Settings,
   CircleHelp,
-  LogOut,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 

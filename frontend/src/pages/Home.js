@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import api from '../services/api';
 import PostCard from '../components/PostCard';
 import { CiSearch } from "react-icons/ci";
@@ -15,16 +15,16 @@ export default function Home() {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState('');
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const res = await api.get('/categories');
       setCategories(res.data?.data || []);
     } catch (err) {
       console.error(err);
     }
-  };
+  }, []);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const params = { page, limit, search, status: 'Published' };
       if (selectedCategory) {
@@ -37,11 +37,11 @@ export default function Home() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [limit, page, search, selectedCategory]);
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [loadCategories]);
 
   useEffect(() => {
     setPage(1);
@@ -49,7 +49,7 @@ export default function Home() {
 
   useEffect(() => {
     load();
-  }, [page, search, selectedCategory]);
+  }, [load]);
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();

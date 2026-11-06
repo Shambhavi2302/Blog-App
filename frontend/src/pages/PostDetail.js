@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useCallback, useEffect, useState, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import CommentForm from '../components/CommentForm';
@@ -88,7 +88,16 @@ export default function PostDetail() {
     ? URL.createObjectURL(coverImageFile)
     : null;
 
-  const load = async () => {
+  const loadComments = useCallback(async (postId) => {
+    try {
+      const res = await api.get(`/posts/${postId}/comments`);
+      setComments(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const load = useCallback(async () => {
     try {
       const res = await api.get(`/posts/${slug}`);
       setPost(res.data.data);
@@ -96,18 +105,9 @@ export default function PostDetail() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [loadComments, slug]);
 
-  const loadComments = async (postId) => {
-    try {
-      const res = await api.get(`/posts/${postId}/comments`);
-      setComments(res.data.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const syncLikedComments = (commentList = comments, currentUser = user) => {
+  const syncLikedComments = useCallback((commentList = comments, currentUser = user) => {
     const currentUserId = currentUser && (currentUser.userId || currentUser.id || currentUser._id);
 
     if (!currentUserId) {
@@ -122,7 +122,7 @@ export default function PostDetail() {
     });
 
     setLikedComments(prev => ({ ...prev, ...nextLikedState }));
-  };
+  }, [comments, user]);
 
   const handleToggleLike = async (comment) => {
     if (!user) return;
@@ -141,7 +141,7 @@ export default function PostDetail() {
     }
   };
 
-  const loadFollowStatus = async (authorId) => {
+  const loadFollowStatus = useCallback(async (authorId) => {
     const followerId = user && (user.userId || user.id || user._id);
 
     if (!authorId || !followerId) {
@@ -156,7 +156,7 @@ export default function PostDetail() {
       console.error(err);
       setIsFollowing(false);
     }
-  };
+  }, [user]);
 
   const handleFollow = async () => {
     if (!post?.author?._id) return;
@@ -290,23 +290,7 @@ export default function PostDetail() {
     }
   };
 
-  const startEdit = (comment) => {
-    setEditingId(comment._id);
-    setEditContent(comment.content || '');
-  };
-
-  const saveEdit = async () => {
-    try {
-      await api.patch(`/comments/${editingId}`, { content: editContent });
-      setEditingId(null);
-      setEditContent('');
-      loadComments(post._id);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => { load(); }, [slug]);
+  useEffect(() => { load(); }, [load]);
   useEffect(() => {
     if (post) {
       setPostForm({
@@ -322,7 +306,7 @@ export default function PostDetail() {
     } else {
       setLikedComments({});
     }
-  }, [comments, user]);
+  }, [comments, syncLikedComments, user]);
 
   useEffect(() => {
     if (post?.author?._id) {
@@ -330,7 +314,7 @@ export default function PostDetail() {
     } else {
       setIsFollowing(false);
     }
-  }, [post?._id, user]);
+  }, [loadFollowStatus, post?.author?._id]);
 
   if (!post) return <div>Loading...</div>;
 

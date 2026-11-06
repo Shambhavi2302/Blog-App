@@ -147,11 +147,7 @@ export default function PostCard({ post = {} }) {
             <FiMessageCircle size={18} />
             <span>{numberOfComments}</span>
           </div>
-
-          <span>
-            {new Date(post.createdAt).toLocaleDateString()}
-          </span>
-
+          
           <span>
             {authorName}
           </span>
